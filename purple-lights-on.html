@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Purple Lights On — Borahae From Manila</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #06010f; color: #fff; }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(6,1,15,0.92); backdrop-filter: blur(12px);
+      border-bottom: 0.5px solid #2a0050;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .75rem 2rem;
+    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-brand svg { width: 28px; height: 28px; }
+    .nav-brand span { font-size: 12px; font-weight: 600; letter-spacing: 3px; color: #aa66cc; }
+    .nav-link {
+      font-size: 13px; color: #9966bb; text-decoration: none;
+      border: 0.5px solid #330055; border-radius: 20px;
+      padding: 6px 16px; transition: border-color .2s, color .2s;
+    }
+    .nav-link:hover { border-color: #cc44ff; color: #ee88ff; }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 4rem 2rem 3rem; text-align: center;
+      border-bottom: 0.5px solid #2a0050;
+      background: radial-gradient(ellipse at 50% 0%, #1a0035 0%, #06010f 65%);
+    }
+    .logo-mark { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; }
+    .logo-mark svg { width: 36px; height: 36px; }
+    .logo-mark span { font-size: 13px; font-weight: 600; letter-spacing: 3px; color: #aa66cc; }
+    .tag {
+      display: inline-block; background: #1e0038;
+      border: 0.5px solid #7733aa; color: #cc88ff;
+      font-size: 11px; letter-spacing: 2px;
+      padding: 5px 16px; border-radius: 20px; margin-bottom: 1.25rem;
+    }
+    .hero h1 {
+      font-size: clamp(28px, 6vw, 52px); font-weight: 800;
+      color: #fff; line-height: 1.15; margin-bottom: 1rem;
+    }
+    .hero h1 span { color: #cc44ff; }
+    .hero p {
+      font-size: 16px; color: #c4a8d8;
+      max-width: 540px; margin: 0 auto 2rem; line-height: 1.75;
+    }
+    .hero-cta {
+      display: inline-block; background: #8833cc;
+      color: #fff; font-size: 15px; font-weight: 600;
+      padding: 14px 36px; border-radius: 50px; text-decoration: none;
+      letter-spacing: 1px; transition: background .2s;
+    }
+    .hero-cta:hover { background: #aa44ee; }
+
+    /* ── STATS ── */
+    .stats-row {
+      display: flex; justify-content: center; gap: 3rem;
+      padding: 1.5rem 2rem; background: #0c0020;
+      border-bottom: 0.5px solid #1e0038; flex-wrap: wrap;
+    }
+    .stat { text-align: center; }
+    .stat-num { font-size: 26px; font-weight: 700; color: #dd66ff; }
+    .stat-label { font-size: 11px; color: #9966bb; letter-spacing: 1.5px; margin-top: 3px; }
+
+    /* ── PROGRESS ── */
+    .progress-wrap {
+      padding: 1rem 2rem; background: #06010f;
+      border-bottom: 0.5px solid #1a0030;
+    }
+    .progress-bar-bg { background: #1a0030; border-radius: 4px; height: 8px; width: 100%; margin-bottom: 8px; }
+    .progress-bar-fill { background: linear-gradient(90deg, #8833cc, #dd44ff); border-radius: 4px; height: 8px; transition: width .5s ease; }
+    .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: #9966bb; }
+
+    /* ── CANVAS ── */
+    .canvas-section { padding: 2rem 1rem 1.5rem; text-align: center; background: #06010f; }
+    .section-eyebrow { font-size: 11px; letter-spacing: 3px; color: #7744aa; margin-bottom: .5rem; text-transform: uppercase; }
+    .section-title { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: .5rem; }
+    .section-sub { font-size: 14px; color: #9977bb; margin-bottom: 1.5rem; }
+    .legend { display: flex; justify-content: center; gap: 2rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .legend-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #9966bb; }
+    .leg-dot { width: 11px; height: 11px; border-radius: 50%; }
+    .canvas-wrap { display: inline-block; position: relative; cursor: crosshair; max-width: 100%; }
+    canvas#heart { display: block; max-width: 100%; height: auto; border-radius: 12px; }
+    .tooltip {
+      position: absolute; background: #1e0038;
+      border: 0.5px solid #7733aa; border-radius: 10px;
+      padding: 10px 14px; font-size: 12px; color: #eeddff;
+      pointer-events: none; opacity: 0; transition: opacity .15s;
+      min-width: 175px; z-index: 10; text-align: left;
+    }
+    .tooltip .t-name { font-weight: 700; font-size: 13px; color: #ee88ff; margin-bottom: 5px; }
+    .tooltip .t-price { color: #cc44ff; font-size: 17px; font-weight: 700; }
+    .tooltip .t-status { font-size: 11px; margin-top: 5px; }
+
+    /* ── SPONSOR PANEL ── */
+    .sponsor-panel {
+      padding: 2.5rem 2rem 2.5rem; background: #06010f;
+      border-top: 0.5px solid #1a0030;
+      max-width: 700px; margin: 0 auto;
+    }
+    .sponsor-panel .section-title { text-align: center; }
+    .sponsor-panel .section-sub { text-align: center; margin-bottom: 1.5rem; }
+    .tiers { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
+    .tier {
+      background: #0c0020; border: 0.5px solid #330055;
+      border-radius: 14px; padding: 1.25rem 1rem;
+      text-align: center; cursor: pointer; transition: border-color .2s, background .2s;
+    }
+    .tier:hover { border-color: #aa33dd; background: #120028; }
+    .tier.active { border-color: #cc44ff; background: #180030; }
+    .tier-icon { font-size: 22px; color: #cc44ff; margin-bottom: 8px; }
+    .tier h3 { font-size: 13px; font-weight: 600; color: #eeddff; margin-bottom: 6px; }
+    .tier-amt { font-size: 22px; font-weight: 700; color: #dd66ff; margin-bottom: 5px; }
+    .tier-desc { font-size: 11px; color: #7755aa; line-height: 1.5; }
+    .confirm-box {
+      display: none; background: #1a003a;
+      border: 0.5px solid #cc44ff; border-radius: 12px;
+      padding: 1.25rem; text-align: center; margin-bottom: 1.25rem;
+    }
+    .confirm-box.show { display: block; }
+    .confirm-box p { color: #eeddff; font-size: 14px; margin-bottom: .4rem; }
+    .confirm-box strong { color: #dd66ff; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .form-full { margin-bottom: 14px; }
+    input[type="text"], input[type="email"] {
+      width: 100%; background: #0c0020;
+      border: 0.5px solid #330055; border-radius: 10px;
+      padding: 12px 16px; font-size: 14px; color: #eeddff; outline: none;
+      transition: border-color .2s; font-family: inherit;
+    }
+    input[type="text"]:focus, input[type="email"]:focus { border-color: #cc44ff; }
+    input::placeholder { color: #553377; }
+    .btn-sponsor {
+      width: 100%; background: #8833cc; border: none;
+      border-radius: 50px; padding: 16px;
+      font-size: 16px; font-weight: 700; color: #fff;
+      cursor: pointer; letter-spacing: 1px;
+      transition: background .2s; font-family: inherit;
+    }
+    .btn-sponsor:hover { background: #aa44ee; }
+
+    /* ── WALL ── */
+    .wall {
+      padding: 2rem 2rem 2.5rem; background: #0a0018;
+      border-top: 0.5px solid #1a0030;
+    }
+    .wall .section-title { text-align: center; font-size: 16px; letter-spacing: 2px; color: #aa66cc; margin-bottom: 1rem; }
+    .wall-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 700px; margin: 0 auto; }
+    .wall-chip {
+      background: #1a0030; border: 0.5px solid #440077;
+      border-radius: 20px; padding: 6px 14px;
+      font-size: 13px; color: #cc99ff;
+    }
+    .wall-chip.new { border-color: #cc44ff; color: #ee88ff; }
+
+    /* ── WHY ── */
+    .why-section {
+      padding: 3rem 2rem; background: #06010f;
+      border-top: 0.5px solid #1a0030; text-align: center;
+    }
+    .why-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; max-width: 700px; margin: 2rem auto 0; }
+    .why-card {
+      background: #0c0020; border: 0.5px solid #2a0050;
+      border-radius: 14px; padding: 1.5rem 1.25rem;
+    }
+    .why-icon { font-size: 24px; color: #cc44ff; margin-bottom: .75rem; }
+    .why-card h3 { font-size: 14px; font-weight: 600; color: #eeddff; margin-bottom: .5rem; }
+    .why-card p { font-size: 13px; color: #7755aa; line-height: 1.6; }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 2rem 2rem 3rem; text-align: center;
+      border-top: 0.5px solid #1a0030; background: #04010a;
+    }
+    footer p { font-size: 12px; color: #553377; line-height: 1.8; }
+    footer strong { color: #7744aa; }
+    footer a { color: #9966bb; text-decoration: none; }
+    footer a:hover { color: #cc44ff; }
+    .footer-logo { margin-bottom: 1rem; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .form-row { grid-template-columns: 1fr; }
+      .stats-row { gap: 1.5rem; }
+      nav { padding: .75rem 1rem; }
+      .nav-brand span { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-brand" href="#">
+    <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="40,5 68,20 68,60 40,75 12,60 12,20" fill="#1e0038" stroke="#7733aa" stroke-width="2"/>
+      <polygon points="40,16 60,27 60,53 40,64 20,53 20,27" fill="#330055" stroke="#aa44cc" stroke-width="1.2"/>
+      <circle cx="40" cy="40" r="9" fill="#cc44ff" opacity="0.95"/>
+    </svg>
+    <span>BORAHAE FROM MANILA</span>
+  </a>
+  <a class="nav-link" href="#sponsor">Sponsor a drone</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="logo-mark">
+    <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="40,5 68,20 68,60 40,75 12,60 12,20" fill="#1e0038" stroke="#7733aa" stroke-width="2"/>
+      <polygon points="40,16 60,27 60,53 40,64 20,53 20,27" fill="#330055" stroke="#aa44cc" stroke-width="1.2"/>
+      <circle cx="40" cy="40" r="9" fill="#cc44ff" opacity="0.95"/>
+    </svg>
+    <span>BORAHAE FROM MANILA</span>
+  </div>
+  <div class="tag">BTS CONCERT PHILIPPINES 2026</div>
+  <h1>Light up the sky<br>for <span>BTS</span></h1>
+  <p>We're sending 580 purple drones into the night sky above Manila — one for every ARMY who sponsors one. Each drone carries your love up to BTS. Together, we paint the stars.</p>
+  <a class="hero-cta" href="#sponsor">Sponsor my drone &rarr;</a>
+</section>
+
+<!-- STATS -->
+<div class="stats-row">
+  <div class="stat"><div class="stat-num" id="s-claimed">142</div><div class="stat-label">DRONES CLAIMED</div></div>
+  <div class="stat"><div class="stat-num" id="s-total">580</div><div class="stat-label">TOTAL DRONES</div></div>
+  <div class="stat"><div class="stat-num" id="s-pct">24%</div><div class="stat-label">FUNDED</div></div>
+  <div class="stat"><div class="stat-num" id="s-raised">₱284,000</div><div class="stat-label">RAISED</div></div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-wrap">
+  <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-fill" style="width:24%"></div></div>
+  <div class="progress-label"><span id="prog-left">438 drones left</span><span>Goal: ₱1,160,000</span></div>
+</div>
+
+<!-- DRONE MAP -->
+<section class="canvas-section">
+  <p class="section-eyebrow">Interactive drone map</p>
+  <h2 class="section-title">Pick your drone</h2>
+  <p class="section-sub">Every dot is a drone. Click any purple light to claim it as yours.</p>
+  <div class="legend">
+    <div class="legend-item"><div class="leg-dot" style="background:#cc44ff;box-shadow:0 0 6px #cc44ff"></div>Available</div>
+    <div class="legend-item"><div class="leg-dot" style="background:#ffffff;box-shadow:0 0 8px #fff"></div>Just sponsored</div>
+    <div class="legend-item"><div class="leg-dot" style="background:#441166"></div>Claimed</div>
+  </div>
+  <div class="canvas-wrap" id="cwrap">
+    <canvas id="heart" width="640" height="380"></canvas>
+    <div class="tooltip" id="tip"></div>
+  </div>
+</section>
+
+<!-- WHY SECTION -->
+<section class="why-section">
+  <p class="section-eyebrow">Why this matters</p>
+  <h2 class="section-title">ARMY making it happen</h2>
+  <div class="why-grid">
+    <div class="why-card">
+      <div class="why-icon">&#9652;</div>
+      <h3>580 drones</h3>
+      <p>Each one a purple light painting the BFM heart logo and 아포방포 into the Manila night sky.</p>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">&#9825;</div>
+      <h3>One drone, one ARMY</h3>
+      <p>Your drone carries your name into the sky. A permanent part of BFM history.</p>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">&#9733;</div>
+      <h3>Fan-powered, 100%</h3>
+      <p>Every peso goes directly to drone show production. No middlemen, full transparency.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SPONSOR PANEL -->
+<section class="sponsor-panel" id="sponsor">
+  <p class="section-eyebrow" style="text-align:center">Step 1 — choose a tier</p>
+  <h2 class="section-title">Sponsor your drone</h2>
+  <p class="section-sub">Every amount helps. Your name lights up on the sponsor wall.</p>
+
+  <div class="tiers">
+    <div class="tier active" data-amt="2000" onclick="selectTier(this)">
+      <div class="tier-icon">&#9670;</div>
+      <h3>Solo ARMY</h3>
+      <div class="tier-amt">&#8369;2,000</div>
+      <div class="tier-desc">1 drone &middot; your name in lights</div>
+    </div>
+    <div class="tier" data-amt="4000" onclick="selectTier(this)">
+      <div class="tier-icon">&#9733;</div>
+      <h3>Purple duo</h3>
+      <div class="tier-amt">&#8369;4,000</div>
+      <div class="tier-desc">2 drones &middot; name + message</div>
+    </div>
+    <div class="tier" data-amt="10000" onclick="selectTier(this)">
+      <div class="tier-icon">&#9825;</div>
+      <h3>Borahae squad</h3>
+      <div class="tier-amt">&#8369;10,000</div>
+      <div class="tier-desc">5 drones &middot; featured on wall</div>
+    </div>
+    <div class="tier" data-amt="20000" onclick="selectTier(this)">
+      <div class="tier-icon">&#9670;&#9670;</div>
+      <h3>ARMY constellation</h3>
+      <div class="tier-amt">&#8369;20,000</div>
+      <div class="tier-desc">10 drones &middot; top of sponsor wall</div>
+    </div>
+  </div>
+
+  <p class="section-eyebrow" style="text-align:center;margin-bottom:.75rem">Step 2 — click a drone above, then fill in your details</p>
+
+  <div class="confirm-box" id="confirm-box">
+    <p>Drone <strong id="c-id">#—</strong> selected &mdash; <strong id="c-pos">outer boundary</strong></p>
+    <p style="font-size:12px;color:#9977bb;">Complete the form below to claim it</p>
+  </div>
+
+  <div class="form-row">
+    <input type="text" placeholder="Your name or ARMY alias" id="f-name"/>
+    <input type="text" placeholder="City / Country" id="f-city"/>
+  </div>
+  <div class="form-full">
+    <input type="email" placeholder="Email address (for confirmation)" id="f-email"/>
+  </div>
+  <div class="form-full">
+    <input type="text" placeholder="Short message for BTS (optional, max 40 chars)" id="f-msg" maxlength="40"/>
+  </div>
+  <button class="btn-sponsor" onclick="doSponsor()">Sponsor my drone &mdash; 아포방포</button>
+</section>
+
+<!-- SPONSOR WALL -->
+<section class="wall">
+  <h2 class="section-title">ARMY Sponsor Wall</h2>
+  <div class="wall-grid" id="wall-grid"></div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">
+    <svg width="40" height="40" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="40,5 68,20 68,60 40,75 12,60 12,20" fill="#1e0038" stroke="#7733aa" stroke-width="2"/>
+      <polygon points="40,16 60,27 60,53 40,64 20,53 20,27" fill="#330055" stroke="#aa44cc" stroke-width="1.2"/>
+      <circle cx="40" cy="40" r="9" fill="#cc44ff" opacity="0.95"/>
+    </svg>
+  </div>
+  <p>
+    <strong>Purple Lights On</strong> is a fan-driven initiative by <strong>Borahae From Manila&reg;</strong><br>
+    All funds go directly to drone show production costs.<br>
+    BTS concert presence is subject to official event logistics and venue approvals.<br>
+    Questions? Reach us at <a href="mailto:borahaefrommanila@gmail.com">borahaefrommanila@gmail.com</a>
+  </p>
+</footer>
+
+<script>
+  const TOTAL = 580;
+  const canvas = document.getElementById('heart');
+  const ctx = canvas.getContext('2d');
+  const tip = document.getElementById('tip');
+
+  const initialSponsors = [
+    "Ate Ria","KimSub_ARMY","Purple_Maui","jimin_babygirl","Bea from Cebu",
+    "TaeTae_Manila","ARMY4Ever_PH","Gelai D.","rm_foreverstan","Lho Jhoanne",
+    "Purple_Cheska","kookie_is_life","V_myuniverse","YNWA_Pinas","Dianne C.",
+    "hopewrld_ph","Suga_myeverything","jks_jungkook","ARMYph_Mariel","bangtan_aira"
+  ];
+  const wallGrid = document.getElementById('wall-grid');
+  initialSponsors.forEach((s, i) => {
+    const c = document.createElement('div');
+    c.className = 'wall-chip' + (i < 2 ? ' new' : '');
+    c.textContent = s;
+    wallGrid.appendChild(c);
+  });
+
+  const CX = 320, CY = 190;
+  const drones = [];
+  let claimedCount = 142;
+  let selectedDrone = null;
+
+  function heartPt(t, scale) {
+    const x = 16 * Math.pow(Math.sin(t), 3);
+    const y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+    return { x: CX + x * scale, y: CY - y * scale };
+  }
+
+  function buildDrones() {
+    drones.length = 0;
+    let id = 1;
+    const scale = 15;
+    for (let i = 0; i < 80; i++) {
+      const t = (i / 80) * Math.PI * 2;
+      const p = heartPt(t, scale);
+      drones.push({ id: id++, x: p.x, y: p.y, layer: 'boundary', claimed: false, sponsored: false });
+    }
+    for (let si = 0.2; si <= 0.95; si += 0.18) {
+      const n = Math.round(60 * si);
+      for (let i = 0; i < n; i++) {
+        const t = (i / n) * Math.PI * 2;
+        const p = heartPt(t, scale * si);
+        drones.push({ id: id++, x: p.x, y: p.y, layer: 'interior', claimed: false, sponsored: false });
+      }
+    }
+    const shuffled = [...drones].sort(() => Math.random() - 0.5);
+    for (let i = 0; i < claimedCount && i < shuffled.length; i++) shuffled[i].claimed = true;
+  }
+
+  buildDrones();
+
+  function drawHeart() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#06010f';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const t = Date.now() / 1200;
+    drones.forEach(d => {
+      const pulse = d.sponsored ? 1 : (0.82 + 0.18 * Math.sin(t + d.id * 0.4));
+      const r = d.layer === 'boundary' ? 5 : 3.5;
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, r * pulse, 0, Math.PI * 2);
+      if (d.sponsored) {
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = '#ffffff';
+        ctx.shadowBlur = 16;
+      } else if (d.claimed) {
+        ctx.fillStyle = '#441166';
+        ctx.shadowBlur = 0;
+      } else {
+        ctx.fillStyle = '#cc44ff';
+        ctx.shadowColor = '#cc44ff';
+        ctx.shadowBlur = d.layer === 'boundary' ? 12 : 7;
+      }
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    });
+  }
+
+  function loop() { drawHeart(); requestAnimationFrame(loop); }
+  loop();
+
+  function getNearestDrone(mx, my) {
+    let best = null, bestD = 999;
+    drones.forEach(d => {
+      const dist = Math.hypot(d.x - mx, d.y - my);
+      if (dist < bestD) { bestD = dist; best = d; }
+    });
+    return bestD < 20 ? best : null;
+  }
+
+  canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    const sx = canvas.width / rect.width;
+    const sy = canvas.height / rect.height;
+    const mx = (e.clientX - rect.left) * sx;
+    const my = (e.clientY - rect.top) * sy;
+    const d = getNearestDrone(mx, my);
+    if (d) {
+      tip.style.opacity = '1';
+      const cx = (d.x / canvas.width) * rect.width;
+      const cy = (d.y / canvas.height) * rect.height;
+      const tipX = cx + 14;
+      const tipY = cy - 20;
+      tip.style.left = tipX + 'px';
+      tip.style.top = tipY + 'px';
+      const layer = d.layer === 'boundary' ? 'Outer boundary' : 'Interior grid';
+      const statusColor = d.sponsored ? '#aaffcc' : d.claimed ? '#553377' : '#cc99ff';
+      const statusText = d.sponsored ? 'Thank you, ARMY!' : d.claimed ? 'This drone is taken' : layer + ' &middot; Click to sponsor';
+      tip.innerHTML = `<div class="t-name">Drone #${String(d.id).padStart(3,'0')}</div>
+        <div class="t-price">${d.sponsored ? 'Sponsored by you!' : d.claimed ? 'Claimed' : '&#8369;2,000'}</div>
+        <div class="t-status" style="color:${statusColor}">${statusText}</div>`;
+    } else {
+      tip.style.opacity = '0';
+    }
+  });
+
+  canvas.addEventListener('click', e => {
+    const rect = canvas.getBoundingClientRect();
+    const sx = canvas.width / rect.width;
+    const sy = canvas.height / rect.height;
+    const mx = (e.clientX - rect.left) * sx;
+    const my = (e.clientY - rect.top) * sy;
+    const d = getNearestDrone(mx, my);
+    if (d && !d.claimed) {
+      selectedDrone = d;
+      const box = document.getElementById('confirm-box');
+      box.innerHTML = `<p>Drone <strong>#${String(d.id).padStart(3,'0')}</strong> selected &mdash; <strong>${d.layer === 'boundary' ? 'Outer boundary' : 'Interior grid'}</strong></p>
+        <p style="font-size:12px;color:#9977bb;">Complete the form below to claim it</p>`;
+      box.classList.add('show');
+      document.getElementById('sponsor').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+
+  canvas.addEventListener('mouseleave', () => { tip.style.opacity = '0'; });
+
+  function selectTier(el) {
+    document.querySelectorAll('.tier').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function updateStats() {
+    const pct = Math.round((claimedCount / TOTAL) * 100);
+    const raised = claimedCount * 2000;
+    document.getElementById('s-claimed').textContent = claimedCount;
+    document.getElementById('s-pct').textContent = pct + '%';
+    document.getElementById('s-raised').textContent = '&#8369;' + raised.toLocaleString();
+    document.getElementById('prog-fill').style.width = pct + '%';
+    document.getElementById('prog-left').textContent = (TOTAL - claimedCount) + ' drones left';
+  }
+
+  function doSponsor() {
+    const name = document.getElementById('f-name').value.trim() || 'Anonymous ARMY';
+    const box = document.getElementById('confirm-box');
+    if (!selectedDrone) {
+      box.classList.add('show');
+      box.innerHTML = `<p style="color:#ffaacc">Please click an available (purple) drone on the map first!</p>`;
+      document.querySelector('.canvas-section').scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+    if (selectedDrone.claimed) {
+      box.classList.add('show');
+      box.innerHTML = `<p style="color:#ffaacc">That drone was just taken! Please select another purple drone.</p>`;
+      return;
+    }
+    selectedDrone.claimed = true;
+    selectedDrone.sponsored = true;
+    claimedCount++;
+    updateStats();
+    const chip = document.createElement('div');
+    chip.className = 'wall-chip new';
+    chip.textContent = name;
+    wallGrid.insertBefore(chip, wallGrid.firstChild);
+    box.innerHTML = `<p style="color:#aaffaa;font-size:16px;font-weight:700">Drone #${String(selectedDrone.id).padStart(3,'0')} is yours, ${name}!</p>
+      <p style="font-size:13px;color:#9977bb;margin-top:6px">Your light will shine for BTS. 아포방포 &#x1F49C;</p>`;
+    document.getElementById('f-name').value = '';
+    document.getElementById('f-city').value = '';
+    document.getElementById('f-email').value = '';
+    document.getElementById('f-msg').value = '';
+    selectedDrone = null;
+  }
+</script>
+</body>
+</html>
